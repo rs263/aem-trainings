@@ -16,19 +16,26 @@
 package com.trainingsite.core.servlets;
 
 import com.day.cq.commons.jcr.JcrConstants;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.trainingsite.core.services.PageListService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
 import org.apache.sling.servlets.annotations.SlingServletResourceTypes;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Servlet that writes some sample content into the response. It is mounted for
@@ -36,22 +43,35 @@ import java.io.IOException;
  * {@link SlingSafeMethodsServlet} shall be used for HTTP methods that are
  * idempotent. For write operations use the {@link SlingAllMethodsServlet}.
  */
-@Component(service = { Servlet.class })
+@Component(service = {Servlet.class})
 @SlingServletResourceTypes(
-        resourceTypes="trainingsite/components/page",
-        methods=HttpConstants.METHOD_GET,
-        extensions="txt")
+        resourceTypes = "training/sampleResourceTypeServlet",
+        methods = HttpConstants.METHOD_GET,
+        extensions = "json")
 @ServiceDescription("Simple Demo Servlet")
 public class
-SimpleServlet extends SlingSafeMethodsServlet {
+SimpleResourceTypeServlet extends SlingSafeMethodsServlet {
 
     private static final long serialVersionUID = 1L;
 
+    @Reference
+    PageListService pageListService;
+
     @Override
-    protected void doGet(final SlingHttpServletRequest req,
-            final SlingHttpServletResponse resp) throws ServletException, IOException {
-        final Resource resource = req.getResource();
-        resp.setContentType("text/plain");
-        resp.getWriter().write("Title = " + resource.getValueMap().get(JcrConstants.JCR_TITLE));
+    protected void doGet(final SlingHttpServletRequest request,
+                         final SlingHttpServletResponse response) throws IOException {
+        String title = request.getParameter("title");
+        ObjectMapper mapper = new ObjectMapper();
+        ResourceResolver resourceResolver = request.getResourceResolver();
+        List<String> pagePaths = pageListService.getAllPageByTitle(resourceResolver, title);
+        String jsonString = Optional.of(pagePaths)
+                .map(pagePathList -> {
+                    try {
+                        return mapper.writeValueAsString(pagePathList);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).orElse("");
+        response.getWriter().write(jsonString);
     }
 }

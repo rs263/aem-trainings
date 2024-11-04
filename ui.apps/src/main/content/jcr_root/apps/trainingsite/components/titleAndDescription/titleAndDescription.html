@@ -1,17 +1,11 @@
-<sly data-sly-use.model="com.trainingsite.core.models.HelloWorldModel"></sly>
 <div class="cmp-helloworld" data-cmp-is="helloworld">
     <h2 class="cmp-helloworld__title">Hello World Component</h2>
     <div class="cmp-helloworld__item" data-sly-test="${properties.text}">
         <p class="cmp-helloworld__item-label">Text property:</p>
         <pre class="cmp-helloworld__item-output" data-cmp-hook-helloworld="property">${properties.text}</pre>
     </div>
-    <div>
-        <p class="cmp-helloworld__description-label">${model.description}</p>
+    <div class="cmp-helloworld__item" data-sly-use.model="com.trainingsite.core.models.HelloWorldModel" data-sly-test="${model.message}">
+        <p class="cmp-helloworld__item-label">Model message:</p>
+        <pre class="cmp-helloworld__item-output"data-cmp-hook-helloworld="model">${model.message}</pre>
     </div>
-    <div data-sly-call="${two @ title=properties.jcr:title}"></div>
 </div>
-
-
-<template data-sly-template.two="${@ title}"> <!--/* Notice the usage hint on the resource parameter. */-->
-    <h1>${title}</h1>
-</template>

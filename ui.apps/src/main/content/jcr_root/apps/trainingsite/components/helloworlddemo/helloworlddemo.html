@@ -1,0 +1,21 @@
+<sly data-sly-use.model="com.trainingsite.core.models.HelloDemoModel"></sly>
+<sly data-sly-test.text="${properties.text}"></sly>
+<sly data-sly-set.subtitle="${model.subtitle}"></sly>
+<div class="cmp-helloworld" data-cmp-is="helloworld">
+    <h2 class="cmp-helloworld__title">Hello World Component</h2>
+    <div class="cmp-helloworld__item" data-sly-test="${text}">
+        <p class="cmp-helloworld__item-label">Text property:</p>
+        <pre class="cmp-helloworld__item-output" data-cmp-hook-helloworld="property">${properties.text}</pre>
+    </div>
+    <div>
+        <section data-sly-resource="${'path' @ resourceType='trainingsite/components/image'}">
+
+        </section>
+
+                <!--<p class="cmp-helloworld__description-label">${subtitle}</p>
+        <ul data-sly-list="${model.pagePaths}">
+            <li>${item}</li>
+        </ul>-->
+    </div>
+<sly data-sly-call="${two @ title=properties.jcr:title}"></sly>
+</div>
